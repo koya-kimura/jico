@@ -9,7 +9,7 @@ let mode = "start";
 let textIndex = 0;
 let textArray = ["クリックして進めてください", "はじめに戻りたい時はEnterキーを押してください"
     , "また、終わった後は下にスクロールしてください"
-    , "これから沢山のあなたを映します", "自然体でカメラを見てください", "それでは始めましょう"
+    , "これから沢山のあなたを映します", "自然体でカメラを見てください", "クリックすると始まります"
 ];
 
 let font;
@@ -37,7 +37,7 @@ function draw() {
         mainTexture.background(0, 255, 0);
         mainTexture.textSize(min(width, height)*0.04);
         mainTexture.noStroke();
-        mainTexture.fill(255, map(noise(frameCount * 0.005), 0, 1, 100, 500));
+        mainTexture.fill(255, map(noise(frameCount * 0.005), 0, 1, 100, 600));
         mainTexture.textAlign(CENTER, CENTER);
         mainTexture.text(textArray[textIndex], width / 2, height / 2);
     }
@@ -49,7 +49,7 @@ function draw() {
             mainTexture.rectMode(CENTER);
 
             // Draw the video capture
-            const step = min(width, height) / 5;
+            const step = min(width, height) / 4;
             for (let x = -width * 0.05; x < width*1.05; x += step) {
                 for (let y = -height * 0.05; y < height*1.05; y += step) {
                     const s = step * 0.8;
@@ -60,17 +60,17 @@ function draw() {
                     mainTexture.rect(x + s * 0.03, y + s * 0.03, s, s);
 
                     // Draw the video capture pg
-                    let pg = createGraphics(s, s);
                     const captureW = random(capture.width);
                     const captureH = random(capture.height);
                     const captureX = random(capture.width - captureW);
                     const captureY = random(capture.height - captureH);
-                    pg.image(capture, 0, 0, s, s, captureX, captureY, captureW, captureH);
-                    mainTexture.image(pg, x, y, s, s);
+
+                    mainTexture.image(capture, x, y, s, s, captureX, captureY, captureW, captureH);
                 }
             }
 
-            const alpha = map(pow(waitTime / 30, 5), 0, 1, 255, 0);
+            const waitMaxTime = 10;
+            const alpha = map(pow(waitTime / waitMaxTime, 5), 0, 1, 230, 0);
             mainTexture.fill(255, alpha);
             mainTexture.rect(width/2, height/2, width, height);
 
@@ -78,7 +78,7 @@ function draw() {
             if (isCaptureReady() && mode == "play") {
                 waitTime++;
             }
-            if (waitTime > 30) {
+            if (waitTime > waitMaxTime) {
                 mode == "end";
                 noLoop();
             }
